@@ -4,23 +4,42 @@
 #
 
 import psycopg2
+import bleach
 
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
+    #return psycopg2.connect("dbname=tournament host=127.0.0.1 "
+                            #"port=8000 user=postgres")
     return psycopg2.connect("dbname=tournament")
 
 
 def deleteMatches():
     """Remove all the match records from the database."""
+    conn = connect()
+    c = conn.cursor()
+    c.execute("delete from matches;")
+    conn.commit()
+    conn.close()
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    conn = connect()
+    c = conn.cursor()
+    c.execute("delete from players;")
+    conn.commit()
+    conn.close()
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    conn = connect()
+    c = conn.cursor()
+    c.execute("select count(id) as num from players;")
+    count = c.fetchall()
+    conn.close()
+    return count[0][0]
 
 
 def registerPlayer(name):
@@ -32,6 +51,12 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    cleaned_name = bleach.clean(name)
+    conn = connect()
+    c = conn.cursor()
+    c.execute("insert into players(name) values('%s');" %cleaned_name)
+    conn.commit()
+    conn.close()
 
 
 def playerStandings():
@@ -47,6 +72,12 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    conn = connect()
+    c = conn.cursor()
+    c.execute("select * from player_standings;")
+    standings = c.fetchall()
+    conn.close()
+    return standings
 
 
 def reportMatch(winner, loser):
@@ -74,4 +105,9 @@ def swissPairings():
         name2: the second player's name
     """
 
+def main():
+     ret = countPlayers()
+     print type(ret)
 
+if __name__ == "__main__":
+    main()

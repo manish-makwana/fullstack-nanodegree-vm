@@ -9,8 +9,6 @@ import bleach
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    #return psycopg2.connect("dbname=tournament host=127.0.0.1 "
-                            #"port=8000 user=postgres")
     return psycopg2.connect("dbname=tournament")
 
 
@@ -51,10 +49,10 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    cleaned_name = bleach.clean(name)
+    c_name = bleach.clean(name)
     conn = connect()
     c = conn.cursor()
-    c.execute("insert into players(name) values('%s');" %cleaned_name)
+    c.execute("insert into players(name) values(%s);", (c_name,))
     conn.commit()
     conn.close()
 
@@ -74,6 +72,7 @@ def playerStandings():
     """
     conn = connect()
     c = conn.cursor()
+    # Use a viewport to simplify the query.
     c.execute("select * from player_standings;")
     standings = c.fetchall()
     conn.close()
@@ -87,6 +86,15 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    c_winner = bleach.clean(winner)
+    c_loser = bleach.clean(loser)
+    conn = connect()
+    c = conn.cursor()
+    c.execute("insert into matches(winner, loser) values(%s, %s);",
+              (c_winner, c_loser))
+    conn.commit()
+    conn.close()
+    # TODO: recalculate each player's standing after reporting match results.
  
  
 def swissPairings():
@@ -105,9 +113,9 @@ def swissPairings():
         name2: the second player's name
     """
 
+    
+
 def main():
-     ret = countPlayers()
-     print type(ret)
 
 if __name__ == "__main__":
     main()

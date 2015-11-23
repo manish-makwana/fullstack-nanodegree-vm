@@ -90,12 +90,16 @@ def reportMatch(winner, loser):
     c_loser = bleach.clean(loser)
     conn = connect()
     c = conn.cursor()
+    # Add record of who played in match.
     c.execute("insert into matches(winner, loser) values(%s, %s);",
               (c_winner, c_loser))
+    # Increment the winner's standing.
+    c.execute("update players "
+              "set standing = standing + 1 "
+              "where id = %s;", (winner,))
     conn.commit()
     conn.close()
-    # TODO: recalculate each player's standing after reporting match results.
- 
+
  
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -112,10 +116,17 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    conn = connect()
+    c = conn.cursor()
+    c.execute("select id, standing from players order by standing;")
+    players = c.fetchall()
+    conn.close()
 
     
 
 def main():
+    return
+
 
 if __name__ == "__main__":
     main()

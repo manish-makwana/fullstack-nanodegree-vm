@@ -52,7 +52,8 @@ def registerPlayer(name):
     c_name = bleach.clean(name)
     conn = connect()
     c = conn.cursor()
-    c.execute("insert into players(name) values(%s);", (c_name,))
+    c.execute("insert into players(name, standing) "
+              "values(%s, 0);", (c_name,))
     conn.commit()
     conn.close()
 
@@ -60,8 +61,8 @@ def registerPlayer(name):
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
 
-    The first entry in the list should be the player in first place, or a player
-    tied for first place if there is currently a tie.
+    The first entry in the list should be the player in first place, or a 
+    player tied for first place if there is currently a tie.
 
     Returns:
       A list of tuples, each of which contains (id, name, wins, matches):
@@ -125,7 +126,13 @@ def swissPairings():
     
 
 def main():
+    deleteMatches()
+    deletePlayers()
+    registerPlayer("Manish M")
+    registerPlayer("Henry A")
+    #reportMatch(k
     return
+
 
 
 if __name__ == "__main__":

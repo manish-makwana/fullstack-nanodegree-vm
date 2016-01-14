@@ -63,10 +63,15 @@ CREATE VIEW player_standings AS
 	FROM player_wins
 	join player_totals ON player_wins.id = player_totals.id;
 
---test code
-INSERT INTO players(NAME) VALUES('manish');
-INSERT INTO players(NAME) VALUES('henry');
-INSERT INTO players(NAME) VALUES('cassie');
-INSERT INTO matches(winner, loser) VALUES(1,2);
-INSERT INTO matches(winner, loser) VALUES(1,2);
-INSERT INTO matches(winner, loser) VALUES(2,1);
+-- Viewports for swissPairings()
+CREATE VIEW pairings AS
+	SELECT
+			a.id AS id1,
+			a.standing AS standing1,
+			b.id AS id2,
+			b.standing AS standing2
+		FROM players AS a
+		left join players AS b
+			ON a.id = b.id - 1
+		WHERE a.id %2 = 1
+		ORDER BY a.standing DESC;

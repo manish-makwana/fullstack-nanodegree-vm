@@ -64,6 +64,7 @@ CREATE VIEW player_standings AS
 	join player_totals ON player_wins.id = player_totals.id;
 
 -- Viewports for swissPairings()
+-- NOT NEEDED ANY MORE
 CREATE VIEW pairings AS
 	SELECT
 			a.id AS id1,

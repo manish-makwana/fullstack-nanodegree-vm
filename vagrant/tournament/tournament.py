@@ -5,6 +5,7 @@
 
 import psycopg2
 import bleach
+import itertools
 
 
 def connect():
@@ -74,7 +75,7 @@ def playerStandings():
     conn = connect()
     c = conn.cursor()
     # Use a viewport to simplify the query.
-    c.execute("select * from player_standings;")
+    c.execute("select * from player_standings order by wins desc;")
     standings = c.fetchall()
     conn.close()
     return standings
@@ -117,13 +118,16 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-    conn = connect()
-    c = conn.cursor()
-    c.execute("select id, standing from players order by standing;")
-    players = c.fetchall()
-    conn.close()
-
-    
+    players = playerStandings()
+    # Remove wins and matches - we only need IDs and names.
+    players_trimmed = [x[:-2] for x in players]
+    # Pair up adjacent players (ranked by number of wins).
+    pairs = zip(players_trimmed[0::2], players_trimmed[1::2])
+    # Unpack the nested tuples to get the desired output.
+    pairs_unpacked = []
+    for pair in pairs:
+        pairs_unpacked.append(tuple(itertools.chain(*pair)))
+    return pairs_unpacked
 
 def main():
     deleteMatches()

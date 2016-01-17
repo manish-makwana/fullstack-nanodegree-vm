@@ -6,37 +6,21 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
+-- Setup commands.
 \c vagrant
 DROP DATABASE IF EXISTS tournament;
 CREATE DATABASE tournament;
 \c tournament
+
 CREATE TABLE players(id SERIAL PRIMARY KEY,
 										 NAME TEXT,
 										 standing INTEGER);
-
---Not needed for initial tests.
---CREATE TABLE tournaments(id SERIAL PRIMARY KEY,
---												 date_held DATE,
---												 location TEXT);
 
 CREATE TABLE matches(id SERIAL PRIMARY KEY,
 										 winner INTEGER REFERENCES players(id),
 										 loser INTEGER REFERENCES players(id));
 
---Not needed yet.
---CREATE TABLE match_ownership(id SERIAL PRIMARY KEY,
---														 tournament_id INTEGER REFERENCES 
---															 tournaments(id),
---														 match_id INTEGER REFERENCES matches(id));
-
---Not needed at this stage - only for multi-tournament play.
---CREATE TABLE standings(player_id INTEGER REFERENCES players(id),
---											 tournament_id INTEGER REFERENCES tournaments(id),
---											 original_rank INTEGER,
---											 had_bye BOOLEAN,
---											 standing REAL,
---											 PRIMARY KEY(player_id, tournament_id));
-
+-- Viewports for playerStandings function.
 CREATE VIEW player_wins AS
 	SELECT players.id, players.NAME, count(matches.winner) AS wins FROM players
 	left join matches
